@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Flowchart</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.js"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css"
+      integrity="sha384-b6lVK+yci+bfDmaY1u0zE8YYJt0TZxLEAFyYSLHId4xoVvsrQu3INevFKo+Xir8e"
+      crossorigin="anonymous"
+    />
+    <!-- <style>
+      .scrollable-place {
+        height: 1000px;
+      }
+
+      .btn {
+        position: relative;
+        float: right;
+        right: 3%;
+        top: 3px;
+      }
+      #download {
+        position: relative;
+        top: 10px;
+        right: 24.5%;
+      }
+      #load {
+        position: relative;
+        top: 10px;
+        left: -24%;
+        margin-right: 20px;
+      }
+      #save {
+        position: relative;
+        right: 58%;
+        top: 10px;
+        margin-right: 20px;
+      }
+      #clear {
+        position: relative;
+        float: right;
+        right: 5%;
+        top: 10px;
+        margin-right: 20px;
+      }
+      #saveName {
+        position: relative;
+        float: right;
+        right: 33%;
+        top: 10px;
+        margin-right: 20px;
+      }
+      #arr {
+        position: relative;
+        float: right;
+        right: 24.5%;
+        top: 10px;
+        margin-right: 20px;
+      }
+      #shapeName {
+        position: relative;
+        right: 1%;
+        top: 10px;
+        left: 38%;
+        margin-right: 20px;
+        width: 150px;
+      }
+      .position {
+        background: #fbfbfb;
+        height: 70px;
+        position: sticky;
+      }
+    </style> -->
+    <meta charset="UTF-8" />
+
+    <script src="flowchart.js"></script>
+    <!-- <div class="position">
+      <button class="btn btn-outline-dark" id="download">
+        <i class="bi bi-cloud-arrow-down-fill p-2 m-2"> PDF</i>
+      </button>
+      <button class="btn btn-outline-success" id="save">
+        <i class="bi bi-sd-card-fill"> Save Shape</i>
+      </button>
+      <button class="btn btn-outline-info" id="load">
+        <i class="bi bi-arrow-clockwise"> Load Shape</i>
+      </button>
+      <button class="btn btn-outline-warning" id="clear">
+        <i class="bi bi-x-circle-fill"> clear Title</i>
+      </button>
+      <button class="btn btn-outline-danger" id="arr">
+        <i class="bi bi-arrow-right"></i>
+      </button>
+      <input type="text" class="input-group-text" id="saveName" />
+      <select id="shapeName" class="form-select">
+        <option value="">Select Shape</option>
+      </select>
+      <div class="scrollable-place">
+        <button onclick="disableScroll()">Disable Scrolling</button>
+        <button onclick="enableScroll()">Enable Scrolling</button>
+      </div> 
+    </div> -->
+    <style>
+      .navbar ul li {
+        margin: 20px;
+      }
+    </style>
+    <nav class="navbar sticky-top navbar-expand-lg bg-dark">
+      <div class="container">
+        <a class="navbar-brand" href="#">Logo</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <div class="mx-auto">
+            <ul class="navbar-nav mr-auto w-100 justify-content-end">
+              <li class="nav-item active">
+                <input type="text" class="input-group-text" id="saveName" />
+              </li>
+              <li class="nav-item">
+                <button class="btn btn-outline-success" id="save">
+                  <i class="bi bi-sd-card-fill"> Save Shape</i>
+                </button>
+              </li>
+              <li class="nav-item">
+                <button class="btn btn-outline-danger" id="arr">
+                  <i class="bi bi-arrow-right"></i>
+                </button>
+              </li>
+              <li class="nav-item">
+                <select id="shapeName" class="form-select">
+                  <option value="">Select Shape</option>
+                </select>
+              </li>
+              <li class="nav-item">
+                <button class="btn btn-outline-info" id="load">
+                  <i class="bi bi-arrow-clockwise"> Load Shape</i>
+                </button>
+              </li>
+              <li class="nav-item">
+                <button class="btn btn-outline-warning" id="clear">
+                  <i class="bi bi-x-circle-fill"> clear Title</i>
+                </button>
+              </li>
+              <li class="nav-item">
+                <button class="btn btn-outline-primary" id="download">
+                  <i class="bi bi-cloud-arrow-down-fill p-2 m-2"> PDF</i>
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <script id="code">
+      function init() {
+        if (window.goSamples) goSamples(); // init for these samples -- you don't need to call this
+        var $ = go.GraphObject.make; // for conciseness in defining templates
+        myDiagram = $(
+          go.Diagram,
+          "myDiagramDiv", // must name or refer to the DIV HTML element
+          {
+            // initialContentAlignment: go.Spot.Center,
+            allowDrop: true, // must be true to accept drops from the Palette
+            LinkDrawn: showLinkLabel, // this DiagramEvent listener is defined below
+            LinkRelinked: showLinkLabel,
+            "animationManager.duration": 800, // slightly longer than default (600ms) animation
+            "undoManager.isEnabled": true, // enable undo & redo
+          }
+        );
+        myDiagram.addDiagramListener("Modified", function (e) {
+          // when the document is modified, add a "*" to the title and enable the "Save" button
+          var button = document.getElementById("save");
+          if (button) button.disabled = !myDiagram.isModified;
+          var idx = document.title.indexOf("*");
+          if (myDiagram.isModified) {
+            if (idx < 0) document.title += "*";
+          } else {
+            if (idx >= 0) document.title = document.title.substr(0, idx);
+          }
+        });
+        function nodeStyle() {
+          return [
+            new go.Binding("location", "loc", go.Point.parse).makeTwoWay(
+              go.Point.stringify
+            ),
+            {
+              locationSpot: go.Spot.Center,
+              mouseEnter: function (e, obj) {
+                showPorts(obj.part, true);
+              },
+              mouseLeave: function (e, obj) {
+                showPorts(obj.part, false);
+              },
+            },
+          ];
+        }
+        function makePort(name, spot, output, input) {
+          return $(go.Shape, "Circle", {
+            // the port is basically just a small circle that has a white stroke when it is made visible
+            fill: "transparent",
+            stroke: null, // this is changed to "white" in the showPorts function
+            desiredSize: new go.Size(8, 8),
+            alignment: spot,
+            alignmentFocus: spot, // align the port on the main Shape
+            portId: name, // declare this object to be a "port"
+            fromSpot: spot,
+            toSpot: spot, // declare where links may connect at this port
+            fromLinkable: output,
+            toLinkable: input, // declare whether the user may draw links to/from here
+            cursor: "pointer", // show a different cursor to indicate potential link point
+          });
+        }
+        var lightText = "black"; // define the Node templates for regular nodes
+        myDiagram.nodeTemplateMap.add(
+          "", // the default category
+          $(
+            go.Node,
+            "Spot",
+            nodeStyle(), // the main object is a Panel that surrounds a TextBlock with a rectangular Shape
+            $(
+              go.Panel,
+              "Auto",
+              $(
+                go.Shape,
+                "Rectangle",
+                { fill: "#D3D3D3", stroke: null },
+                new go.Binding("figure", "figure")
+              ),
+              $(
+                go.TextBlock,
+                {
+                  font: "bold 11pt Helvetica, Arial, sans-serif",
+                  stroke: lightText,
+                  margin: 8,
+                  maxSize: new go.Size(160, NaN),
+                  wrap: go.TextBlock.WrapFit,
+                  editable: true,
+                },
+                new go.Binding("text").makeTwoWay()
+              )
+            ), // four named ports, one on each side:
+            makePort("T", go.Spot.Top, false, true),
+            makePort("L", go.Spot.Left, true, true),
+            makePort("R", go.Spot.Right, true, true),
+            makePort("B", go.Spot.Bottom, true, false)
+          )
+        );
+        myDiagram.nodeTemplateMap.add(
+          "Start",
+          $(
+            go.Node,
+            "Spot",
+            nodeStyle(),
+            $(
+              go.Panel,
+              "Auto",
+              $(go.Shape, "Circle", {
+                minSize: new go.Size(40, 40),
+                fill: "#79C900",
+                stroke: null,
+              }),
+              $(
+                go.TextBlock,
+                "Start",
+                {
+                  font: "bold 11pt Helvetica, Arial, sans-serif",
+                  stroke: lightText,
+                },
+                new go.Binding("text")
+              )
+            ), // three named ports, one on each side except the top, all output only:
+            makePort("L", go.Spot.Left, true, false),
+            makePort("R", go.Spot.Right, true, false),
+            makePort("B", go.Spot.Bottom, true, false)
+          )
+        );
+        myDiagram.nodeTemplateMap.add(
+          "End",
+          $(
+            go.Node,
+            "Spot",
+            nodeStyle(),
+            $(
+              go.Panel,
+              "Auto",
+              $(go.Shape, "Circle", {
+                minSize: new go.Size(40, 40),
+                fill: "#DC3C00",
+                stroke: "black",
+              }),
+              $(
+                go.TextBlock,
+                "End",
+                {
+                  font: "bold 11pt Helvetica, Arial, sans-serif",
+                  stroke: lightText,
+                },
+                new go.Binding("text")
+              )
+            ), // three named ports, one on each side except the bottom, all input only:
+            makePort("T", go.Spot.Top, false, true),
+            makePort("L", go.Spot.Left, false, true),
+            makePort("R", go.Spot.Right, false, true)
+          )
+        );
+        myDiagram.nodeTemplateMap.add(
+          "Comment",
+          $(
+            go.Node,
+            "Auto",
+            nodeStyle(),
+            $(go.Shape, "File", { fill: "#EFFAB4", stroke: null }),
+            $(
+              go.TextBlock,
+              {
+                margin: 5,
+                maxSize: new go.Size(200, NaN),
+                wrap: go.TextBlock.WrapFit,
+                textAlign: "center",
+                editable: true,
+                font: "bold 12pt Helvetica, Arial, sans-serif",
+                stroke: "black",
+              },
+              new go.Binding("text").makeTwoWay()
+            ) // no ports, because no links are allowed to connect with a comment
+          )
+        ); // replace the default Link template in the linkTemplateMap
+        myDiagram.linkTemplate = $(
+          go.Link, // the whole link panel
+          {
+            routing: go.Link.AvoidsNodes,
+            curve: go.Link.JumpOver,
+            corner: 5,
+            toShortLength: 4,
+            relinkableFrom: true,
+            relinkableTo: true,
+            reshapable: true,
+            resegmentable: true, // mouse-overs subtly highlight links:
+            mouseEnter: function (e, link) {
+              link.findObject("HIGHLIGHT").stroke = "rgba(30,144,255,0.2)";
+            },
+            mouseLeave: function (e, link) {
+              link.findObject("HIGHLIGHT").stroke = "transparent";
+            },
+          },
+          new go.Binding("points").makeTwoWay(),
+          $(
+            go.Shape, // the highlight shape, normally transparent
+            {
+              isPanelMain: true,
+              strokeWidth: 8,
+              stroke: "transparent",
+              name: "HIGHLIGHT",
+            }
+          ),
+          $(
+            go.Shape, // the link path shape
+            { isPanelMain: true, stroke: "gray", strokeWidth: 2 }
+          ),
+          $(
+            go.Shape, // the arrowhead
+            { toArrow: "standard", stroke: null, fill: "gray" }
+          ),
+          $(
+            go.Panel,
+            "Auto", // the link label, normally not visible
+            {
+              visible: false,
+              name: "LABEL",
+              segmentIndex: 2,
+              segmentFraction: 0.5,
+            },
+            new go.Binding("visible", "visible").makeTwoWay(),
+            $(
+              go.Shape,
+              "RoundedRectangle", // the label shape
+              { fill: "#F8F8F8", stroke: null }
+            ),
+            $(
+              go.TextBlock,
+              "Yes", // the label
+              {
+                textAlign: "center",
+                font: "10pt helvetica, arial, sans-serif",
+                stroke: "#333333",
+                editable: true,
+              },
+              new go.Binding("text").makeTwoWay()
+            )
+          )
+        ); // Make link labels visible if coming out of a "conditional" node.        // This listener is called by the "LinkDrawn" and "LinkRelinked" DiagramEvents.
+        function showLinkLabel(e) {
+          var label = e.subject.findObject("LABEL");
+          if (label !== null)
+            label.visible = e.subject.fromNode.data.figure === "Diamond";
+        } // temporary links used by LinkingTool and RelinkingTool are also orthogonal:
+        myDiagram.toolManager.linkingTool.temporaryLink.routing =
+          go.Link.Orthogonal;
+        myDiagram.toolManager.relinkingTool.temporaryLink.routing =
+          go.Link.Orthogonal;
+        load(); // load an initial diagram from some JSON text        // initialize the Palette that is on the left side of the page
+        myPalette = $(
+          go.Palette,
+          "myPaletteDiv", // must name or refer to the DIV HTML element
+          {
+            "animationManager.duration": 800, // slightly longer than default (600ms) animation
+            nodeTemplateMap: myDiagram.nodeTemplateMap, // share the templates used by myDiagram
+            model: new go.GraphLinksModel([
+              // specify the contents of the Palette
+              { category: "Start", text: "Start" },
+              { text: "Step" },
+              { text: "Deci", figure: "Diamond" },
+              { category: "Comment", text: "Comment" },
+              { text: "input", figure: "input" },
+              { text: "database", figure: "database" },
+              { text: "terminal", figure: "ellipse" },
+              { text: "document", figure: "document" },
+              { category: "End", text: "End" },
+            ]),
+          }
+        );
+      } // Make all ports on a node visible when the mouse is over the node
+      function showPorts(node, show) {
+        var diagram = node.diagram;
+        if (!diagram || diagram.isReadOnly || !diagram.allowLink) return;
+        node.ports.each(function (port) {
+          port.stroke = show ? "white" : null;
+        });
+      } // Show the diagram's model in JSON format that the user may edit
+      function save() {
+        document.getElementById("mySavedModel").value =
+          myDiagram.model.toJson();
+        myDiagram.isModified = false;
+      }
+      function load() {
+        myDiagram.model = go.Model.fromJson(
+          document.getElementById("mySavedModel").value
+        );
+      } // add an SVG rendering of the diagram at the end of this page
+      function makeSVG() {
+        var svg = myDiagram.makeSvg({
+          scale: 0.5,
+        });
+        svg.style.border = "1px solid black";
+        obj = document.getElementById("SVGArea");
+        obj.appendChild(svg);
+        if (obj.children.length > 0) {
+          obj.replaceChild(svg, obj.children[0]);
+        }
+      }
+      $(function () {
+        $("#sample").trigger("onload");
+      });
+    </script>
+  </head>
+  <body>
+    <div id="sample" onload="init()">
+      <div style="width: 100%; white-space: nowrap">
+        <span
+          style="
+            display: inline-block;
+            vertical-align: top;
+            padding: 5px;
+            width: 100px;
+          "
+        >
+          <style>
+            .sidenav {
+              height: 2520px;
+              width: 120px;
+              position: fixed;
+              top: 12.3%;
+              left: 0;
+            }
+            #myPaletteDiv {
+              padding: 50px;
+            }
+          </style>
+          <div class="sidenav">
+            <div
+              id="myPaletteDiv"
+              style="
+                background-color: white;
+                border: solid 1px gray;
+                position: relative;
+                top: 8px;
+                height: 800px;
+              "
+            ></div>
+          </div>
+        </span>
+        <span
+          id="diagram"
+          style="
+            display: inline-block;
+            vertical-align: top;
+            padding: 5px;
+            width: 90%;
+          "
+        >
+          <div
+            id="myDiagramDiv"
+            style="
+              border: solid 1px gray;
+              background-color: white;
+              height: 2520px;
+              position: relative;
+              top: 2px;
+              left: 1%;
+            "
+          ></div>
+        </span>
+      </div>
+
+      <div style="display: none">
+        Diagram Model saved in JSON format:
+        <textarea id="mySavedModel" style="width: 100%; height: 1500px">
+{ 
+  "nodeDataArray": [
+
+ ],
+  "linkDataArray": [
+]}
+  </textarea
+        >
+      </div>
+    </div>
+    <script>
+      window.onload = function () {
+        document.getElementById("download").addEventListener("click", () => {
+          const invoice = this.document.getElementById("myDiagramDiv");
+          console.log(invoice);
+          console.log(window);
+          var opt = {
+            margin: 1,
+            filename: "myfile.pdf",
+            image: { type: "jpeg", quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: "in", format: "a2", orientation: "portrait" },
+          };
+          html2pdf().from(invoice).set(opt).save();
+        });
+      };
+    </script>
+    <script>
+      // Save the diagram
+      $("#save").click(function () {
+        var name = $("#saveName").val();
+        if (name == "") {
+          alert("Please enter a name for the flowchart");
+        } else if (localStorage.getItem(name) != null) {
+          alert("Flowchart name already exists,please enter a different name.");
+        } else {
+          var json = myDiagram.model.toJson();
+          var saveName = $("#saveName").val();
+          localStorage.setItem(saveName, json);
+          $("#shapeName").append(
+            $("<option></option> ").val(saveName).text(saveName)
+          );
+        }
+      });
+      $(document).ready(function () {
+        for (var i = 0; i < localStorage.length; i++) {
+          var shapeName = localStorage.key(i);
+          var shapeData = localStorage.getItem(shapeName);
+          $("#shapeName").append(
+            "<option value='" + shapeName + "'>" + shapeName + "</option>"
+          );
+        }
+      });
+      // Load the diagram
+      $("#load").click(function () {
+        var selectedSave = $("#shapeName").val();
+        console.log(selectedSave);
+        var savedDiagram = localStorage.getItem(selectedSave);
+        myDiagram.model = go.Model.fromJson(savedDiagram);
+      });
+      $("#clear").click(function () {
+        var confirm = window.confirm(
+          "Are you sure you want to clear all saved shapes?"
+        );
+        if (confirm) {
+          localStorage.clear();
+          $("#shapeName").find("option").remove();
+          $("#shapeName").append("<option value=''>Select Shape</option>");
+        }
+      });
+    </script>
+    <!-- <script>
+      function disableScroll() {
+        // Get the current page scroll position
+        scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        (scrollLeft =
+          window.pageXOffset || document.documentElement.scrollLeft),
+          // if any scroll is attempted,
+          // set this to the previous value
+          (window.onscroll = function () {
+            window.scrollTo(scrollLeft, scrollTop);
+          });
+      }
+
+      function enableScroll() {
+        window.onscroll = function () {};
+      }
+    </script> -->
+  </body>
+</html>
